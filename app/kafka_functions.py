@@ -59,7 +59,5 @@ def kafka_publish(topic:str, value:Dict, producer:KafkaProducer) -> None:
 
 def create_kafka_connection() -> None:
     create_kafka_topic("vehicles")
-    create_kafka_topic('trafficlights')
     create_kafka_topic('edges')
-    create_kafka_topic('output')
 

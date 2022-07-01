@@ -18,9 +18,12 @@ if 'SUMO_HOME' in os.environ:
 else:
     sys.exit("please declare environment variable 'SUMO_HOME'")
 
-def run(steps: int, edges: List[str], tls: List[str], producer: KafkaProducer, consumer: KafkaConsumer) -> None:
+#runs the simulation while publishing vehicles states and listen for traffic light updates
+def run(steps: int, edges: List[str], producer: KafkaProducer, consumer: KafkaConsumer) -> None:
+    wtime_tot = 0
     for step in range(steps):
         traci.simulationStep()
+        print(f'wainting time: {wtime_tot}')
         if step%1 == 0:
             vehicles = traci.vehicle.getIDList()
             for vehicle in vehicles:
@@ -53,12 +56,12 @@ def run(steps: int, edges: List[str], tls: List[str], producer: KafkaProducer, c
                     print(f'Traffic light {tl} state changed')
                 except:
                     pass
-
-        
-
+     
+#close sumo simulation
 def close_sumo() -> None:
     traci.close
 
+#start a sumo simulation while creating kafka consumer and producer
 def start_simulation(sumo_cfg: str) -> None:
     kf.create_kafka_connection()
     kafka_producer = kf.create_kafka_producer()
@@ -66,45 +69,15 @@ def start_simulation(sumo_cfg: str) -> None:
     
     sumo_cmd = ["sumo-gui", "-c", sumo_cfg, "--start", "--step-length", "1"]
     traci.start(sumo_cmd)
-    edge_ids = subscribe_to_edges()
-    #print(len(edge_ids))
-    tl_ids = subscribe_to_tls()
-    #print(len(tl_ids))
 
-    steps = 100000
+    steps = 1000
+    edges = traci.edge.getIDList()
     try:
-        run(steps=steps, edges=edge_ids, tls=tl_ids, producer=kafka_producer, consumer=consumer)
+        run(steps=steps, edges=edges, producer=kafka_producer, consumer=consumer)
     except KeyboardInterrupt:
         pass
     finally:
         close_sumo()
-
-def subscribe_to_edges() -> List[str]:
-    edge_ids = traci.edge.getIDList()
-    for edge_id in edge_ids:
-        traci.edge.subscribe(
-            edge_id,
-            [tc.LAST_STEP_VEHICLE_NUMBER, tc.LAST_STEP_VEHICLE_ID_LIST]
-        )
-    return edge_ids
-
-def subscribe_to_vehicles():
-    veh_ids = traci.vehicle.getIDList()
-    for veh_id in veh_ids:
-        traci.vehicle.subscribe(
-            veh_id,
-            [tc.LAST_STEP_MEAN_SPEED]
-        )
-    return veh_ids
-
-def subscribe_to_tls():
-    tl_ids = traci.trafficlight.getIDList()
-    for tl_id in tl_ids:
-        traci.trafficlight.subscribe(
-            tl_id,
-            [tc.TL_RED_YELLOW_GREEN_STATE, tc.TL_CONTROLLED_JUNCTIONS, tc.TL_NEXT_SWITCH]
-        )
-    return tl_ids
 
 if __name__ == "__main__":
     

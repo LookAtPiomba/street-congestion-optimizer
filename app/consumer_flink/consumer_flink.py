@@ -10,13 +10,6 @@ env_settings = (
 )
 st_env = StreamTableEnvironment.create(env, environment_settings=env_settings)
 
-""" kafka_jar = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                            'flink-sql-connector-kafka-0.11_2.11-1.11.2.jar')
-sjak
-st_env.get_config()\
-            .get_configuration()\
-            .set_string("pipeline.jars", "file://{}".format(kafka_jar)) """
-
 # Define source
 st_env.execute_sql(
     f"""
@@ -62,16 +55,14 @@ st_env.execute_sql(
 """
 )
 
-#st_env.from_path('source').select('TOP 1 step').order_by('step DESC').execute().print()
-
-
+#query source table for avg speed for each traffic light
 st_env.from_path("source").window(
-    Slide.over("2.seconds").every("2.seconds").on("rowtime").alias("w")
+    Slide.over("4.seconds").every("4.seconds").on("rowtime").alias("w")
 ).group_by('w, next_tl').select(
     "AVG(speed) as avg_speed, next_tl as tl"
-).where('avg_speed < 2').insert_into(
+).where('avg_speed < 3').insert_into(
     "sink"
 )
 
-
+#Execute the job
 st_env.execute("PyFlink job")
