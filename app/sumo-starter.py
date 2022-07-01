@@ -20,10 +20,8 @@ else:
 
 #runs the simulation while publishing vehicles states and listen for traffic light updates
 def run(steps: int, edges: List[str], producer: KafkaProducer, consumer: KafkaConsumer) -> None:
-    wtime_tot = 0
     for step in range(steps):
         traci.simulationStep()
-        print(f'wainting time: {wtime_tot}')
         if step%1 == 0:
             vehicles = traci.vehicle.getIDList()
             for vehicle in vehicles:
@@ -53,7 +51,6 @@ def run(steps: int, edges: List[str], producer: KafkaProducer, consumer: KafkaCo
                 tl = message.value['tl_id']
                 try:
                     traci.trafficlight.setPhaseDuration(tl, 0)
-                    print(f'Traffic light {tl} state changed')
                 except:
                     pass
      
@@ -70,7 +67,7 @@ def start_simulation(sumo_cfg: str) -> None:
     sumo_cmd = ["sumo-gui", "-c", sumo_cfg, "--start", "--step-length", "1"]
     traci.start(sumo_cmd)
 
-    steps = 1000
+    steps = 100000
     edges = traci.edge.getIDList()
     try:
         run(steps=steps, edges=edges, producer=kafka_producer, consumer=consumer)
