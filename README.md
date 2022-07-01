@@ -2,11 +2,14 @@
 Traffic congestion optimization with python, SUMO, Apache Kafka and Apache Flink
 
 Requirements:
-    - Download Docker at https://www.docker.com/products/docker-desktop/
-    - Download sumo at https://www.eclipse.org/sumo/
-    - Set SUMO_HOME environment variable
+
+Download [Docker](https://www.docker.com/products/docker-desktop/ "Docker")   
+Download [SUMO](https://www.eclipse.org/sumo/ "SUMO")
+
+Set SUMO_HOME environment variable
 
 How to use it:
+
     - Make sure that docker daemon is running
     - Change the path to SUMO_HOME in the 'sumo_starter.py' file
     - Open a shell and run 'python setup.py'
