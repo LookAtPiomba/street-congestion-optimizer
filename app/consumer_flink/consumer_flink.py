@@ -28,7 +28,7 @@ st_env.execute_sql(
         next_tl_state STRING,
         ts BIGINT,
         rowtime as TO_TIMESTAMP(FROM_UNIXTIME(ts, 'yyyy-MM-dd HH:mm:ss')),
-        WATERMARK FOR rowtime AS rowtime - INTERVAL '5' SECOND
+        WATERMARK FOR rowtime AS rowtime - INTERVAL '2' SECOND
     ) WITH (
         'connector' = 'kafka-0.11',
         'topic' = '{os.environ["KAFKA_TOPIC"]}',
@@ -66,7 +66,7 @@ st_env.execute_sql(
 
 
 st_env.from_path("source").window(
-    Slide.over("5.seconds").every("3.seconds").on("rowtime").alias("w")
+    Slide.over("2.seconds").every("2.seconds").on("rowtime").alias("w")
 ).group_by('w, next_tl').select(
     "AVG(speed) as avg_speed, next_tl as tl"
 ).where('avg_speed < 2').insert_into(

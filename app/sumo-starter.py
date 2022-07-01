@@ -29,7 +29,7 @@ def run(steps: int, edges: List[str], tls: List[str], producer: KafkaProducer, c
                 if len(next_tls) > 0:
                     tl = next_tls[0][0]
                     tl_state = next_tls[0][-1]
-                    if (next_tls[0][2] <= 30):
+                    if (next_tls[0][2] <= 50):
                         kf.kafka_publish(
                             topic = 'vehicles',
                             producer=producer,

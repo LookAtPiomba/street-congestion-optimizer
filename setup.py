@@ -1,7 +1,7 @@
 import subprocess, sys, os
 from typing import final
 
-CMD = ['docker-compose', 'up', '--build', '-d'] # '--build', 
+CMD = ['docker-compose', 'up', '-d'] # '--build', 
 try:
     subprocess.run(CMD)
 except Exception as e:
