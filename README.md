@@ -1,5 +1,5 @@
-# bdt2022_project
-Traffic congestion optimization with python, SUMO, Apache Kafka and Apache Flink
+# Street congestion optimizer
+Traffic congestion optimization with python, Apache Kafka and Apache Flink using a SUMO simulation of the italian city of Trento.
 
 Requirements:
 
